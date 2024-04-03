@@ -1,14 +1,7 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import './TaskOne.css';
 
-function TaskOne() {
-    /**
-     * Вынесите эти стейты в свой хук, все изменения полей должны валидирвоаться по разным правилам:
-     * firstName, lastName - не могут быть пустыми
-     * email - должен совпадать с паттерном email, по которому стандартный email адрес- валидный, а test или @some или some@te - будут не валидны
-     * password - должен быть не меньше 5 символов и должен включать в себя цифры и сепц символы (%$@ и т.д.)
-     * confirmPassword - должен совпадать с password
-     * */
+const useForm = () => {  // Мой пользовательский хук
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -16,59 +9,81 @@ function TaskOne() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
 
-    // Ваш хук должен возвращать фукцию которую будет использовать форма для сабмита данных
+    const validateForm = () => {
+        const newError = {};
+
+        if (!firstName || !lastName) {
+            newError.name = 'First Name and Last Name are required';
+        } else if (!email.match(/^[a-zA-Z0-9]+@[a-zA-Z]+\.[a-zA-Z]{2,}$/)) {
+            newError.email = 'Invalid email format';
+        } else if (password.length < 5 || !password.match(/[0-9!@#$%^&*]/)) {
+            newError.password = 'Password should be at least 5 characters and contain numbers or special characters';
+        } else if (password !== confirmPassword) {
+            newError.confirmPassword = 'Passwords do not match';
+        }
+        setError(newError);
+        return Object.keys(newError).length === 0;
+    };
+
     const onSubmitHandle = (event) => {
         event.preventDefault();
 
-        const {
-            firstName,
-            lastName,
-            email,
-            password,
-            confirmPassword,
-        } = event;
+        if (!validateForm()) {
+            return;
+        }
 
-        // Здесь вы можете обрабатывать логику отправки формы,
-        // например, вызвать ваш API для отправки данных формы
-
-        // После успешной отправки формы, очистите все поля
         setFirstName('');
         setLastName('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
-
-
-        // И используйте alert, чтобы показать результат
-        alert(JSON.stringify({firstName,
-            lastName,
-            email,
-            password,
-            confirmPassword,}));
+        alert(JSON.stringify({ firstName, lastName, email, password, confirmPassword }));
     };
 
-    // TODO: реализуйте пользовательский хук для валидации
-    // const submitForm = useSubmitForm(onSubmitHandle);
+    return { firstName, setFirstName, lastName, setLastName, email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, error, onSubmitHandle };
+};
 
-    // Замени сеттеры из стейта на callback-и из твоего хука
+
+function TaskOne() {
+    const { firstName, setFirstName, lastName, setLastName, email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, error, onSubmitHandle } = useForm();
+
     return (
         <div className="form-container">
-            <div className="error-message">{error}</div>
             <form onSubmit={onSubmitHandle}> {/* Измените здесь на submitForm, когда он будет готов */}
-                <input type="text" name="firstName" placeholder="First Name" className="form-input"
-                       onChange={(e) => setFirstName(e.target.value)} value={firstName}/>
-                <input type="text" name="lastName" placeholder="Last Name" className="form-input"
-                       onChange={(e) => setLastName(e.target.value)} value={lastName}/>
-                <input type="email" name="email" placeholder="Email" className="form-input"
-                       onChange={(e) => setEmail(e.target.value)} value={email}/>
-                <input type="password" name="password" placeholder="Password" className="form-input"
-                       onChange={(e) => setPassword(e.target.value)} value={password}/>
-                <input type="password" name="confirmPassword" placeholder="Confirm Password" className="form-input"
-                       onChange={(e) => setConfirmPassword(e.target.value)} value={confirmPassword}/>
+                <div className="form-container_item">
+                    <input type="text" name="firstName" placeholder="First Name" className="form-input"
+                        onChange={(e) => setFirstName(e.target.value)} value={firstName}/>
+                    {error.name && <div className="error-message">{error.name}</div>}
+                </div>
+
+                <div className="form-container_item">
+                    <input type="text" name="lastName" placeholder="Last Name" className="form-input"
+                        onChange={(e) => setLastName(e.target.value)} value={lastName}/>
+                    {error.name && <div className="error-message">{error.name}</div>}
+                </div>
+
+                <div className="form-container_item">
+                    <input type="text" name="email" placeholder="Email" className="form-input"
+                        onChange={(e) => setEmail(e.target.value)} value={email}/>
+                    {error.email && <div className="error-message">{error.email}</div>}
+                </div>
+
+                <div className="form-container_item">
+                    <input type="password" name="password" placeholder="Password" className="form-input"
+                        onChange={(e) => setPassword(e.target.value)} value={password}/>
+                    {error.password && <div className="error-message">{error.password}</div>}
+                </div>
+
+                <div className="form-container_item">
+                    <input type="password" name="confirmPassword" placeholder="Confirm Password" className="form-input"
+                            onChange={(e) => setConfirmPassword(e.target.value)} value={confirmPassword}/>
+                    {error.confirmPassword && <div className="error-message">{error.confirmPassword}</div>}
+                </div>
+
                 <button type="submit" className="form-button">Register</button>
             </form>
         </div>
     );
-}
+};
 
 export default TaskOne;
