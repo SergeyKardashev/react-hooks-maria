@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import { memo, useMemo, useCallback, useState } from 'react';
 import RenderCounter from './render-counter/RenderCounter';
 import './TaskTwo.css';
 
@@ -7,36 +8,40 @@ export default function TaskTwo() {
     return (
         <div className="TaskTwo">
             <button onClick={update}>Обновить компонент</button>
-            {/*<RenderCounter />*/}
+            <RenderCounter />
             <Root />
         </div>
     )
 }
 
-const Root = () => {
-    const [value, setValue] = React.useState('')
-    const handleChange = (event) => {
+const Root = memo(() => {
+    const [value, setValue] = useState('')
+    const handleChange = useCallback((event) => {
         setValue(event.target.value)
-    }
-    return (
-        <form className="form-container">
-            Введенное значение: {value}
-            {/*<RenderCounter />*/}
-            <Input onChange={handleChange} />
-        </form>
-    )
-}
+    }, []); // Мемоизируем функцию handleChange
 
-const Input = ({ onChange }) => {
+    const memoizedValue = useMemo(() => {
+        return (
+            <form className="form-container">
+                Введенное значение: {value}
+                <RenderCounter />
+                <Input onChange={handleChange} />
+            </form>
+        );
+    }, [value, handleChange]);
+    return memoizedValue;
+});
+
+const Input = memo(({ onChange }) => {
     return (
         <div className="input-container">
             <input type="text" className="input-field" name="value" onChange={onChange} />
-            {/*<RenderCounter />*/}
+            <RenderCounter />
         </div>
-    )
-}
+    );
+});
 
 function useUpdate() {
-    const [, setCount] = React.useState(0)
-    return () => { setCount(counter => counter + 1) }
-}
+    const [, setCount] = useState(0)
+    return useCallback(() => { setCount(counter => counter + 1) }, []);
+};

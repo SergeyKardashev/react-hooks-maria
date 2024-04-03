@@ -15,8 +15,12 @@
     flex-direction: column;
 }
 
+.form-container_item {
+    margin-bottom: 1rem;
+}
+
 .form-input {
-    margin: 0 auto 1rem;
+    margin: 0 auto;
     min-width: 20rem;
     padding: 1rem;
     border-radius: 0.5rem;
@@ -46,5 +50,6 @@
 
 .error-message {
     color: red;
-    margin-bottom: 1rem;
+    font-size: 12px;
+    margin: 5px 15px 0;
 }
