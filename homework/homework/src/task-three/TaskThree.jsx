@@ -27,8 +27,9 @@ const useDebounce = (value, delay) => {
 };
 
 // кастомный хук для запросов к API принимает текст запроса
-const useFetchData = (search) => {
+const useFetchData = () => {
     // стейты внутри хука
+    const [search, setSearch] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -60,12 +61,11 @@ const useFetchData = (search) => {
         }
     }, [debouncedSearch]);
 
-    return { data, loading };
+    return { search, setSearch, data, loading };
 };
 
 export default function TaskThree() {
-    const [search, setSearch] = useState('');
-    const { data: posts, loading } = useFetchData(search);
+    const { search, setSearch, data: posts, loading } = useFetchData();
 
     return (
         <div className="TaskThree">
@@ -79,7 +79,7 @@ export default function TaskThree() {
             {loading ? <p>Loading...</p> : (
                 <ul>
                     {posts.map((post) => (
-                        // Используем `post.id` в качестве ключа элемента списка
+                        // Используем `post.id` в качестве ключа элемента списка, т.к. АПИ шлёт данные без ключа.
                         <li key={post.id}>
                             <h2>{post.title}</h2>
                             <p>{post.body}</p>
